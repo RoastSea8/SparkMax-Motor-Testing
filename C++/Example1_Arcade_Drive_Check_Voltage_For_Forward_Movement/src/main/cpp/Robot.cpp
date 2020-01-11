@@ -5,10 +5,8 @@
 /* the project.                                                               */
 /*----------------------------------------------------------------------------*/
 
-#include <frc/Joystick.h>
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
-#include <frc/drive/DifferentialDrive.h>
 #include "rev/CANSparkMax.h"
 
 class Robot : public frc::TimedRobot {
@@ -42,10 +40,30 @@ class Robot : public frc::TimedRobot {
    * Because of this, we only need to pass the lead motors to m_robotDrive. Whatever commands are 
    * sent to them will automatically be copied by the follower motors
    */
-  frc::DifferentialDrive m_robotDrive{m_leftLeadMotor, m_rightLeadMotor};
-
-  frc::Joystick m_stick{0};
+  void MoveForward(double speed) {
+    m_leftLeadMotor.Set(speed);
+    m_rightLeadMotor.Set(speed);
+  }
   
+  void MoveBackward(double speed) {
+    m_leftLeadMotor.Set(speed);
+    m_rightLeadMotor.Set(speed);
+  }
+
+  void TurnLeft(double speed){
+    m_leftLeadMotor.Set(-speed);
+    m_rightLeadMotor.Set(speed);
+  }
+
+  void TurnRight(double speed){
+    m_leftLeadMotor.Set(speed);
+    m_rightLeadMotor.Set(-speed);
+  } 
+
+  void StopMotor(double speed) {
+    m_leftLeadMotor.Set(speed);
+    m_rightLeadMotor.Set(speed);
+  } 
  public:
   void RobotInit() {
     /**
@@ -70,9 +88,8 @@ class Robot : public frc::TimedRobot {
   }
 
   void TeleopPeriodic() {
-    // Drive with arcade style
-    m_robotDrive.ArcadeDrive(-m_stick.GetY(), m_stick.GetX());
-
+    //setting the speed to 1 so that it moves forward
+    MoveForward(1);
     // read the voltage on the lead motors to check whether motors are moving forward or not. 
     if((m_analogSensor_left_motor.GetVoltage() > 0) && (m_analogSensor_right_motor.GetVoltage() > 0)) {  
       frc::SmartDashboard::PutString("Motor Sensor Positive voltage", "Motor moving forward");
@@ -81,16 +98,36 @@ class Robot : public frc::TimedRobot {
       frc::SmartDashboard::PutString("ERROR:Motor Sensor voltage", "Not positive");
     }
 
-    // Another option is to read voltage fed into motor controller and use the same for finding motor movement direction 
-   
-    if((m_leftLeadMotor.GetBusVoltage() > 0) && (m_rightLeadMotor.GetBusVoltage() > 0)) { 
-      frc::SmartDashboard::PutString("Motor controller bus voltage is positive", "Motor moving forward");
+    //setting the speed to -1 so that it moves backward
+    MoveBackward(-1);
+    // read the voltage on the lead motors to check whether motors are moving backward or not.
+    if((m_analogSensor_left_motor.GetVoltage() < 0) && (m_analogSensor_right_motor.GetVoltage() < 0)) {  
+      frc::SmartDashboard::PutString("Motor Sensor Negative voltage", "Motor moving backward");
     } else {
-      frc::SmartDashboard::PutString("ERROR:Motor controller bus voltage", "Not positive");
+
+      frc::SmartDashboard::PutString("ERROR:Motor Sensor voltage", "Not negative");
     }
+
+    TurnLeft(1);
+    if ((m_analogSensor_left_motor.GetVoltage() < 0) && (m_analogSensor_right_motor.GetVoltage() > 0)) {
+      frc::SmartDashboard::PutString("Left Motor Sensor Negative voltage / Right Motor Sensor Positive voltage", "Motor moving left");
+    } else {
+      frc::SmartDashboard::PutString("ERROR:Motor Sensor voltage", "Not turning left");
+    }
+
+    TurnRight(1);
+    if ((m_analogSensor_left_motor.GetVoltage() > 0) && (m_analogSensor_right_motor.GetVoltage() < 0)) {
+      frc::SmartDashboard::PutString("Left Motor Sensor Positive voltage / Right Motor Sensor Negative voltage", "Motor moving left");
+    } else {
+      frc::SmartDashboard::PutString("ERROR:Motor Sensor voltage", "Not turning right");
+    }
+    //Setting the speed to 0 so that the motor stops
+    StopMotor(0);
   }
 };
 
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
 #endif
+
+    
