@@ -21,17 +21,17 @@ class Robot : public frc::TimedRobot {
    * Initializes four brushless motors with CAN IDs 1, 2, 3 and 4.
    */
   static const int leftLeadDeviceID = 1, leftFollowDeviceID = 2, rightLeadDeviceID = 3, rightFollowDeviceID = 4;
-  rev::CANSparkMax m_leftLeadMotor{leftLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless};
-  rev::CANSparkMax m_rightLeadMotor{rightLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless};
-  rev::CANSparkMax m_leftFollowMotor{leftFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless};
-  rev::CANSparkMax m_rightFollowMotor{rightFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless};
+  rev::CANSparkMax* m_leftLeadMotor = new rev::CANSparkMax(leftLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless);
+  rev::CANSparkMax* m_rightLeadMotor = new rev::CANSparkMax(rightLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless);
+  rev::CANSparkMax* m_leftFollowMotor = new rev::CANSparkMax(leftFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless);
+  rev::CANSparkMax* m_rightFollowMotor = new rev::CANSparkMax(rightFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless);
    
    /**
    * A CANAnalog object is constructed using the GetAnalog() method on an 
    * existing CANSparkMax object. 
    */
-  rev::CANAnalog m_analogSensor_left_motor = m_leftLeadMotor.GetAnalog();
-  rev::CANAnalog m_analogSensor_right_motor = m_rightLeadMotor.GetAnalog();
+  rev::CANAnalog m_analogSensor_left_motor = m_leftLeadMotor->GetAnalog();
+  rev::CANAnalog m_analogSensor_right_motor = m_rightLeadMotor->GetAnalog();
 
   /**
    * In RobotInit() below, we will configure m_leftFollowMotor and m_rightFollowMotor to follow 
@@ -41,28 +41,34 @@ class Robot : public frc::TimedRobot {
    * sent to them will automatically be copied by the follower motors
    */
   void MoveForward(double speed) {
-    m_leftLeadMotor.Set(speed);
-    m_rightLeadMotor.Set(speed);
+    //speeds are positive so that the motors move forward
+    m_leftLeadMotor->Set(speed); 
+    m_rightLeadMotor->Set(speed);
   }
   
   void MoveBackward(double speed) {
-    m_leftLeadMotor.Set(speed);
-    m_rightLeadMotor.Set(speed);
+    //setting the speeds to negative to make the motors move backward
+    m_leftLeadMotor->Set(-speed); 
+    m_rightLeadMotor->Set(-speed);
   }
 
   void TurnLeft(double speed){
-    m_leftLeadMotor.Set(-speed);
-    m_rightLeadMotor.Set(speed);
+    //setting the speed to negative to make the left motor move backward
+    m_leftLeadMotor->Set(-speed); 
+    //setting the speed to positive to make the right motor move forward
+    m_rightLeadMotor->Set(speed); 
   }
 
   void TurnRight(double speed){
-    m_leftLeadMotor.Set(speed);
-    m_rightLeadMotor.Set(-speed);
+    //setting the speed to positive to make the left motor move forward 
+    m_leftLeadMotor->Set(speed); 
+    //setting the speed to negative to make the right motor move backward
+    m_rightLeadMotor->Set(-speed); 
   } 
 
-  void StopMotor(double speed) {
-    m_leftLeadMotor.Set(speed);
-    m_rightLeadMotor.Set(speed);
+  void StopMotor(){
+    m_leftLeadMotor->Set(0);
+    m_rightLeadMotor->Set(0);
   } 
  public:
   void RobotInit() {
@@ -71,10 +77,10 @@ class Robot : public frc::TimedRobot {
      * in the SPARK MAX to their factory default state. If no argument is passed, these
      * parameters will not persist between power cycles
      */
-    m_leftLeadMotor.RestoreFactoryDefaults();
-    m_rightLeadMotor.RestoreFactoryDefaults();
-    m_leftFollowMotor.RestoreFactoryDefaults();
-    m_rightFollowMotor.RestoreFactoryDefaults();
+    m_leftLeadMotor->RestoreFactoryDefaults();
+    m_rightLeadMotor->RestoreFactoryDefaults();
+    m_leftFollowMotor->RestoreFactoryDefaults();
+    m_rightFollowMotor->RestoreFactoryDefaults();
     
     /**
      * In CAN mode, one SPARK MAX can be configured to follow another. This is done by calling
@@ -83,8 +89,8 @@ class Robot : public frc::TimedRobot {
      * 
      * one motor on each side of our drive train is configured to follow a lead motor.
      */
-    m_leftFollowMotor.Follow(m_leftLeadMotor);
-    m_rightFollowMotor.Follow(m_rightLeadMotor);
+    m_leftFollowMotor->Follow(*m_leftLeadMotor);
+    m_rightFollowMotor->Follow(*m_rightLeadMotor);
   }
 
   void TeleopPeriodic() {
@@ -93,14 +99,14 @@ class Robot : public frc::TimedRobot {
     // read the voltage on the lead motors to check whether motors are moving forward or not. 
     if((m_analogSensor_left_motor.GetVoltage() > 0) && (m_analogSensor_right_motor.GetVoltage() > 0)) {  
       frc::SmartDashboard::PutString("Motor Sensor Positive voltage", "Motor moving forward");
-    } else {
-
+    } else { 
+      
       frc::SmartDashboard::PutString("ERROR:Motor Sensor voltage", "Not positive");
     }
 
     //setting the speed to -1 so that it moves backward
-    MoveBackward(-1);
-    // read the voltage on the lead motors to check whether motors are moving backward or not.
+    MoveBackward(1);
+    // read the voltage on the lead motors to check whether motors are moving backward or not
     if((m_analogSensor_left_motor.GetVoltage() < 0) && (m_analogSensor_right_motor.GetVoltage() < 0)) {  
       frc::SmartDashboard::PutString("Motor Sensor Negative voltage", "Motor moving backward");
     } else {
@@ -121,8 +127,8 @@ class Robot : public frc::TimedRobot {
     } else {
       frc::SmartDashboard::PutString("ERROR:Motor Sensor voltage", "Not turning right");
     }
-    //Setting the speed to 0 so that the motor stops
-    StopMotor(0);
+    
+    StopMotor(); //passing 0 as the input parameter to make the speed 0 = stop
   }
 };
 
