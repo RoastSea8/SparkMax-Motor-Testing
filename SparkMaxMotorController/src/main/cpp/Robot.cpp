@@ -97,7 +97,7 @@ class Robot : public frc::TimedRobot {
     //setting the speed to 1 so that it moves forward
     MoveForward(1);
     // read the voltage on the lead motors to check whether motors are moving forward or not. 
-    if((m_analogSensor_left_motor.GetVoltage() > 0) && (m_analogSensor_right_motor.GetVoltage() > 0)) {  
+    if((m_analogSensor_left_motor.GetVelocity() > 0) && (m_analogSensor_right_motor.GetVelocity() > 0)) {  
       frc::SmartDashboard::PutString("Motor Sensor Positive voltage", "Motor moving forward");
     } else { 
       
@@ -107,7 +107,7 @@ class Robot : public frc::TimedRobot {
     //setting the speed to -1 so that it moves backward
     MoveBackward(1);
     // read the voltage on the lead motors to check whether motors are moving backward or not
-    if((m_analogSensor_left_motor.GetVoltage() < 0) && (m_analogSensor_right_motor.GetVoltage() < 0)) {  
+    if((m_analogSensor_left_motor.GetVelocity() < 0) && (m_analogSensor_right_motor.GetVelocity() < 0)) {  
       frc::SmartDashboard::PutString("Motor Sensor Negative voltage", "Motor moving backward");
     } else {
 
@@ -115,14 +115,14 @@ class Robot : public frc::TimedRobot {
     }
 
     TurnLeft(1);
-    if ((m_analogSensor_left_motor.GetVoltage() < 0) && (m_analogSensor_right_motor.GetVoltage() > 0)) {
+    if ((m_analogSensor_left_motor.GetVelocity() < 0) && (m_analogSensor_right_motor.GetVelocity() > 0)) {
       frc::SmartDashboard::PutString("Left Motor Sensor Negative voltage / Right Motor Sensor Positive voltage", "Motor moving left");
     } else {
       frc::SmartDashboard::PutString("ERROR:Motor Sensor voltage", "Not turning left");
     }
 
     TurnRight(1);
-    if ((m_analogSensor_left_motor.GetVoltage() > 0) && (m_analogSensor_right_motor.GetVoltage() < 0)) {
+    if ((m_analogSensor_left_motor.GetVelocity() > 0) && (m_analogSensor_right_motor.GetVelocity() < 0)) {
       frc::SmartDashboard::PutString("Left Motor Sensor Positive voltage / Right Motor Sensor Negative voltage", "Motor moving left");
     } else {
       frc::SmartDashboard::PutString("ERROR:Motor Sensor voltage", "Not turning right");
