@@ -30,8 +30,8 @@ class Robot : public frc::TimedRobot {
    * A CANAnalog object is constructed using the GetAnalog() method on an 
    * existing CANSparkMax object. 
    */
-  rev::CANAnalog m_analogSensor_left_motor = m_leftLeadMotor->GetAnalog();
-  rev::CANAnalog m_analogSensor_right_motor = m_rightLeadMotor->GetAnalog();
+  rev::CANEncoder m_encoderSensor_left_motor = m_leftLeadMotor->GetEncoder();
+  rev::CANEncoder m_encoderSensor_right_motor = m_rightLeadMotor->GetEncoder();
 
   /**
    * In RobotInit() below, we will configure m_leftFollowMotor and m_rightFollowMotor to follow 
@@ -97,7 +97,7 @@ class Robot : public frc::TimedRobot {
     //setting the speed to 1 so that it moves forward
     MoveForward(1);
     // read the voltage on the lead motors to check whether motors are moving forward or not. 
-    if((m_analogSensor_left_motor.GetVelocity() > 0) && (m_analogSensor_right_motor.GetVelocity() > 0)) {  
+    if((m_encoderSensor_left_motor.GetVelocity() > 0) && (m_encoderSensor_right_motor.GetVelocity() > 0)) {  
       frc::SmartDashboard::PutString("Motor Sensor Positive voltage", "Motor moving forward");
     } else { 
       
@@ -107,7 +107,7 @@ class Robot : public frc::TimedRobot {
     //setting the speed to -1 so that it moves backward
     MoveBackward(1);
     // read the voltage on the lead motors to check whether motors are moving backward or not
-    if((m_analogSensor_left_motor.GetVelocity() < 0) && (m_analogSensor_right_motor.GetVelocity() < 0)) {  
+    if((m_encoderSensor_left_motor.GetVelocity() < 0) && (m_encoderSensor_right_motor.GetVelocity() < 0)) {  
       frc::SmartDashboard::PutString("Motor Sensor Negative voltage", "Motor moving backward");
     } else {
 
@@ -115,14 +115,14 @@ class Robot : public frc::TimedRobot {
     }
 
     TurnLeft(1);
-    if ((m_analogSensor_left_motor.GetVelocity() < 0) && (m_analogSensor_right_motor.GetVelocity() > 0)) {
+    if ((m_encoderSensor_left_motor.GetVelocity() < 0) && (m_encoderSensor_right_motor.GetVelocity() > 0)) {
       frc::SmartDashboard::PutString("Left Motor Sensor Negative voltage / Right Motor Sensor Positive voltage", "Motor moving left");
     } else {
       frc::SmartDashboard::PutString("ERROR:Motor Sensor voltage", "Not turning left");
     }
 
     TurnRight(1);
-    if ((m_analogSensor_left_motor.GetVelocity() > 0) && (m_analogSensor_right_motor.GetVelocity() < 0)) {
+    if ((m_encoderSensor_left_motor.GetVelocity() > 0) && (m_encoderSensor_right_motor.GetVelocity() < 0)) {
       frc::SmartDashboard::PutString("Left Motor Sensor Positive voltage / Right Motor Sensor Negative voltage", "Motor moving left");
     } else {
       frc::SmartDashboard::PutString("ERROR:Motor Sensor voltage", "Not turning right");
