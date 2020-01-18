@@ -14,7 +14,7 @@
 using namespace std; 
 
 // Create a file called myFile
-static ofstream myFile;
+static ofstream adityaFile;
 
 class Robot : public frc::TimedRobot {
   /**
@@ -32,8 +32,8 @@ class Robot : public frc::TimedRobot {
   rev::CANSparkMax* m_rightLeadMotor = new rev::CANSparkMax(rightLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless);
   rev::CANSparkMax* m_leftFollowMotor = new rev::CANSparkMax(leftFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless);
   rev::CANSparkMax* m_rightFollowMotor = new rev::CANSparkMax(rightFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless);
-   
-   /**
+
+  /**
    * A CANAnalog object is constructed using the GetAnalog() method on an 
    * existing CANSparkMax object. 
    */
@@ -70,7 +70,7 @@ class Robot : public frc::TimedRobot {
       m_leftLeadMotor->Set(leftMotorSpeed);
       m_rightLeadMotor->Set(rightMotorSpeed); 
       // outputting speeds of both motors to file 
-      myFile << "\n Expected direction: " << direction << " Left motor speed: " << leftMotorSpeed << " Right motor speed: " << rightMotorSpeed << "\n";
+      adityaFile << "\n Expected direction: " << direction << " Left motor speed: " << leftMotorSpeed << " Right motor speed: " << rightMotorSpeed << "\n";
 
       // variable to hold the value of GetVelocity() for the left motor
       double leftMotorVelocity = m_encoderSensor_left_motor.GetVelocity();
@@ -81,35 +81,35 @@ class Robot : public frc::TimedRobot {
         case 1:
           // if the velocities of both motors are the same, and if their velocities are greater than 0, then the robot is moving forward
           if((leftMotorVelocity > 0) && (leftMotorVelocity == rightMotorVelocity)) {  
-            myFile << "SUCCESSFULL: Robot moving FORWARD with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity <<"\n";
+            adityaFile << "SUCCESSFULL: Robot moving FORWARD with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity <<"\n";
           } else
           {
-             myFile << "ERROR: Robot not moving FORWARD - LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
-             return;
+            adityaFile << "ERROR: Robot not moving FORWARD - LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
+            return;
           }
-           break;
+          break;
         case 2: 
           // if the velocities of both motors are the same, and if their velocities are less than 0, then the robot is moving backward
           if((leftMotorVelocity < 0) && (leftMotorVelocity == rightMotorVelocity)) {
-            myFile << "SUCCESSFULL: Robot moving BACKWARD with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
+            adityaFile << "SUCCESSFULL: Robot moving BACKWARD with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
           } else {
-            myFile << "ERROR: Robot not moving BACKWARD - LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
+            adityaFile << "ERROR: Robot not moving BACKWARD - LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
           }
-           break;
+          break;
         case 3: 
           // if the velocity of the right motor is greater than the velocity of the left motor, the robot is turning left
           if (leftMotorVelocity < rightMotorVelocity) {
-            myFile << "SUCCESSFULL: Robot turning LEFT with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
+            adityaFile << "SUCCESSFULL: Robot turning LEFT with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
           } else {
-            myFile << "ERROR: Robot not turning LEFT - LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
+            adityaFile << "ERROR: Robot not turning LEFT - LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
           }
           break;
         case 4:
           // if the velocity of the left motor is greater than the velocity of the right motor, the robot is turning right
           if (leftMotorVelocity > rightMotorVelocity) {
-            myFile << "SUCCESSFULL: Robot turning RIGHT with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
+            adityaFile << "SUCCESSFULL: Robot turning RIGHT with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
           } else {
-            myFile << "ERROR: Robot not turning RIGHT - LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
+            adityaFile << "ERROR: Robot not turning RIGHT - LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
           }
           break;
           default:
@@ -150,6 +150,7 @@ class Robot : public frc::TimedRobot {
     m_leftFollowMotor->Follow(*m_leftLeadMotor);
     m_rightFollowMotor->Follow(*m_rightLeadMotor);
 
+    adityaFile.open("velocityData.txt");
     //moving at half speed
     Move(0.5, 0.5);   //Forward
     Move(-0.5, -0.5); //Backward
@@ -158,7 +159,7 @@ class Robot : public frc::TimedRobot {
     StopMotors(); //stopping the motors
 
     //closing the file
-    myFile.close();
+    adityaFile.close();
   };
 
   void TeleopPeriodic() {
