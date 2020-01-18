@@ -8,6 +8,13 @@
 #include <frc/TimedRobot.h>
 #include <frc/smartdashboard/SmartDashboard.h>
 #include "rev/CANSparkMax.h"
+#include <iostream> 
+#include <fstream>
+
+using namespace std; 
+
+// Create a file called myFile
+static ofstream myFile;
 
 class Robot : public frc::TimedRobot {
   /**
@@ -40,33 +47,53 @@ class Robot : public frc::TimedRobot {
    * Because of this, we only need to pass the lead motors to m_robotDrive. Whatever commands are 
    * sent to them will automatically be copied by the follower motors
    */
-  void MoveForward(double speed) {
-    //speeds are positive so that the motors move forward
-    m_leftLeadMotor->Set(speed); 
-    m_rightLeadMotor->Set(speed);
-  }
   
-  void MoveBackward(double speed) {
-    //setting the speeds to negative to make the motors move backward
-    m_leftLeadMotor->Set(-speed); 
-    m_rightLeadMotor->Set(-speed);
+  void Move(double leftMotorSpeed, double rightMotorSpeed) {
+    // checking if both motor speeds are in range: between or equal to -1 and 1
+    if (((leftMotorSpeed >= -1) && (leftMotorSpeed <= 1)) && ((rightMotorSpeed >= -1) and (rightMotorSpeed <= 1))) {
+      // setting the speed of the lead motors
+      m_leftLeadMotor->Set(leftMotorSpeed);
+      m_rightLeadMotor->Set(rightMotorSpeed); 
+      // outputting speeds of both motors to file   
+      myFile << "Left motor speed: " << leftMotorSpeed;
+      myFile << "Right motor speed: " << rightMotorSpeed; 
+
+      // variable to hold the value of GetVelocity() for the left motor
+      double leftMotorVelocity = m_encoderSensor_left_motor.GetVelocity();
+      // variable to hold the value of GetVelocity() for the right motor
+      double rightMotorVelocity = m_encoderSensor_right_motor.GetVelocity();
+
+    // if the velocities of both motors are the same, and if their velocities are greater than 0, then the robot is moving forward
+    if((leftMotorVelocity > 0) && (leftMotorVelocity == rightMotorVelocity)) {  
+      myFile << "OUTPUT: Robot moving FORWARD with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity;
+    } 
+    // if the velocities of both motors are the same, and if their velocities are less than 0, then the robot is moving backward
+    else if((leftMotorVelocity < 0) && (leftMotorVelocity == rightMotorVelocity)) {
+      myFile << "OUTPUT: Robot moving BACKWARD with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity;
+    }
+    // if both the velocities are equal to 0, then the robot is not moving
+    // if the velocities of both motors are not equal to each other, then there is a mechanical/electrical issue
+    else {
+      myFile << "OUTPUT: Robot not moving because LEFT motor velocity = RIGHT motor velocity = 0 OR mechanical/electrical issue";
+    };
+
+    // if the velocity of the right motor is greater than the velocity of the left motor, the robot is turning left
+    if (leftMotorVelocity < rightMotorVelocity) {
+      myFile << "OUTPUT: Robot turning LEFT with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity;
+     } 
+     // if the velocity of the left motor is greater than the velocity of the right motor, the robot is turning right
+    else if (leftMotorVelocity > rightMotorVelocity) {
+      myFile << "OUTPUT: Robot turning RIGHT with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity;
+    }
+    }
+    // outputting an error if the left or right motor speeds are not in range
+    else { 
+      frc::SmartDashboard::PutString("ERROR: Left motor speed not in range/", "right motor speed not in range");
+    }
   }
 
-  void TurnLeft(double speed){
-    //setting the speed to negative to make the left motor move backward
-    m_leftLeadMotor->Set(-speed); 
-    //setting the speed to positive to make the right motor move forward
-    m_rightLeadMotor->Set(speed); 
-  }
-
-  void TurnRight(double speed){
-    //setting the speed to positive to make the left motor move forward 
-    m_leftLeadMotor->Set(speed); 
-    //setting the speed to negative to make the right motor move backward
-    m_rightLeadMotor->Set(-speed); 
-  } 
-
-  void StopMotor(){
+  void StopMotors(){
+    //passing 0 as the parameter to make the motors stop
     m_leftLeadMotor->Set(0);
     m_rightLeadMotor->Set(0);
   } 
@@ -91,47 +118,23 @@ class Robot : public frc::TimedRobot {
      */
     m_leftFollowMotor->Follow(*m_leftLeadMotor);
     m_rightFollowMotor->Follow(*m_rightLeadMotor);
-  }
+
+    //moving at half speed
+    Move(0.5, 0.5);   //Forward
+    Move(-0.5, -0.5); //Backward
+    Move(-0.5, 0.5);  //Left - the left motor moves backward and the right motor moves forward
+    Move(0.5, -0.5);  //Right - the left motor moves forward and the right motor moves backward
+    StopMotors(); //stopping the motors
+
+    //closing the file
+    myFile.close();
+  };
 
   void TeleopPeriodic() {
-    //setting the speed to 1 so that it moves forward
-    MoveForward(1);
-    // read the voltage on the lead motors to check whether motors are moving forward or not. 
-    if((m_encoderSensor_left_motor.GetVelocity() > 0) && (m_encoderSensor_right_motor.GetVelocity() > 0)) {  
-      frc::SmartDashboard::PutString("Motor Sensor Positive voltage", "Motor moving forward");
-    } else { 
-      
-      frc::SmartDashboard::PutString("ERROR:Motor Sensor voltage", "Not positive");
-    }
 
-    //setting the speed to -1 so that it moves backward
-    MoveBackward(1);
-    // read the voltage on the lead motors to check whether motors are moving backward or not
-    if((m_encoderSensor_left_motor.GetVelocity() < 0) && (m_encoderSensor_right_motor.GetVelocity() < 0)) {  
-      frc::SmartDashboard::PutString("Motor Sensor Negative voltage", "Motor moving backward");
-    } else {
+  };
 
-      frc::SmartDashboard::PutString("ERROR:Motor Sensor voltage", "Not negative");
-    }
-
-    TurnLeft(1);
-    if ((m_encoderSensor_left_motor.GetVelocity() < 0) && (m_encoderSensor_right_motor.GetVelocity() > 0)) {
-      frc::SmartDashboard::PutString("Left Motor Sensor Negative voltage / Right Motor Sensor Positive voltage", "Motor moving left");
-    } else {
-      frc::SmartDashboard::PutString("ERROR:Motor Sensor voltage", "Not turning left");
-    }
-
-    TurnRight(1);
-    if ((m_encoderSensor_left_motor.GetVelocity() > 0) && (m_encoderSensor_right_motor.GetVelocity() < 0)) {
-      frc::SmartDashboard::PutString("Left Motor Sensor Positive voltage / Right Motor Sensor Negative voltage", "Motor moving left");
-    } else {
-      frc::SmartDashboard::PutString("ERROR:Motor Sensor voltage", "Not turning right");
-    }
-    
-    StopMotor(); //passing 0 as the input parameter to make the speed 0 = stop
-  }
 };
-
 #ifndef RUNNING_FRC_TESTS
 int main() { return frc::StartRobot<Robot>(); }
 #endif
