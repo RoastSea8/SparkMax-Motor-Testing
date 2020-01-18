@@ -49,47 +49,78 @@ class Robot : public frc::TimedRobot {
    */
   
   void Move(double leftMotorSpeed, double rightMotorSpeed) {
+    int direction; 
     // checking if both motor speeds are in range: between or equal to -1 and 1
-    if (((leftMotorSpeed >= -1) && (leftMotorSpeed <= 1)) && ((rightMotorSpeed >= -1) and (rightMotorSpeed <= 1))) {
+    if (((leftMotorSpeed >= -1) && (leftMotorSpeed <= 1)) && ((rightMotorSpeed >= -1) && (rightMotorSpeed <= 1))) {
+      if (leftMotorSpeed == rightMotorSpeed){
+        if (leftMotorSpeed > 0) {
+          direction = 1; //forward
+        } else if (leftMotorSpeed < 0) {
+          direction = 2; //backward
+        }
+      } 
+      else {
+        if (leftMotorSpeed > rightMotorSpeed) {
+          direction = 4; //right
+        } else {
+          direction = 3; //left
+        }
+      }
       // setting the speed of the lead motors
       m_leftLeadMotor->Set(leftMotorSpeed);
       m_rightLeadMotor->Set(rightMotorSpeed); 
-      // outputting speeds of both motors to file   
-      myFile << "Left motor speed: " << leftMotorSpeed;
-      myFile << "Right motor speed: " << rightMotorSpeed; 
+      // outputting speeds of both motors to file 
+      myFile << "\n Expected direction: " << direction << " Left motor speed: " << leftMotorSpeed << " Right motor speed: " << rightMotorSpeed << "\n";
 
       // variable to hold the value of GetVelocity() for the left motor
       double leftMotorVelocity = m_encoderSensor_left_motor.GetVelocity();
       // variable to hold the value of GetVelocity() for the right motor
       double rightMotorVelocity = m_encoderSensor_right_motor.GetVelocity();
 
-    // if the velocities of both motors are the same, and if their velocities are greater than 0, then the robot is moving forward
-    if((leftMotorVelocity > 0) && (leftMotorVelocity == rightMotorVelocity)) {  
-      myFile << "OUTPUT: Robot moving FORWARD with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity;
-    } 
-    // if the velocities of both motors are the same, and if their velocities are less than 0, then the robot is moving backward
-    else if((leftMotorVelocity < 0) && (leftMotorVelocity == rightMotorVelocity)) {
-      myFile << "OUTPUT: Robot moving BACKWARD with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity;
-    }
-    // if both the velocities are equal to 0, then the robot is not moving
-    // if the velocities of both motors are not equal to each other, then there is a mechanical/electrical issue
-    else {
-      myFile << "OUTPUT: Robot not moving because LEFT motor velocity = RIGHT motor velocity = 0 OR mechanical/electrical issue";
-    };
-
-    // if the velocity of the right motor is greater than the velocity of the left motor, the robot is turning left
-    if (leftMotorVelocity < rightMotorVelocity) {
-      myFile << "OUTPUT: Robot turning LEFT with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity;
-     } 
-     // if the velocity of the left motor is greater than the velocity of the right motor, the robot is turning right
-    else if (leftMotorVelocity > rightMotorVelocity) {
-      myFile << "OUTPUT: Robot turning RIGHT with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity;
-    }
-    }
-    // outputting an error if the left or right motor speeds are not in range
-    else { 
+      switch (direction) {
+        case 1:
+          // if the velocities of both motors are the same, and if their velocities are greater than 0, then the robot is moving forward
+          if((leftMotorVelocity > 0) && (leftMotorVelocity == rightMotorVelocity)) {  
+            myFile << "SUCCESSFULL: Robot moving FORWARD with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity <<"\n";
+          } else
+          {
+             myFile << "ERROR: Robot not moving FORWARD - LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
+             return;
+          }
+           break;
+        case 2: 
+          // if the velocities of both motors are the same, and if their velocities are less than 0, then the robot is moving backward
+          if((leftMotorVelocity < 0) && (leftMotorVelocity == rightMotorVelocity)) {
+            myFile << "SUCCESSFULL: Robot moving BACKWARD with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
+          } else {
+            myFile << "ERROR: Robot not moving BACKWARD - LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
+          }
+           break;
+        case 3: 
+          // if the velocity of the right motor is greater than the velocity of the left motor, the robot is turning left
+          if (leftMotorVelocity < rightMotorVelocity) {
+            myFile << "SUCCESSFULL: Robot turning LEFT with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
+          } else {
+            myFile << "ERROR: Robot not turning LEFT - LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
+          }
+          break;
+        case 4:
+          // if the velocity of the left motor is greater than the velocity of the right motor, the robot is turning right
+          if (leftMotorVelocity > rightMotorVelocity) {
+            myFile << "SUCCESSFULL: Robot turning RIGHT with LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
+          } else {
+            myFile << "ERROR: Robot not turning RIGHT - LEFT motor velocity = " << leftMotorVelocity << " and RIGHT motor velocity = " << rightMotorVelocity << "\n";
+          }
+          break;
+          default:
+          //Error invalid direction 
+          frc::SmartDashboard::PutString("ERROR: Invalid Direction", "\n");
+        }
+    } else { 
+      // outputting an error if the left or right motor speeds are not in range
       frc::SmartDashboard::PutString("ERROR: Left motor speed not in range/", "right motor speed not in range");
     }
+    return;
   }
 
   void StopMotors(){
