@@ -13,7 +13,7 @@
 
 using namespace std; 
 
-// Create a file called myFile
+// Create a file called adityaFile
 static ofstream adityaFile;
 
 class Robot : public frc::TimedRobot {
@@ -150,7 +150,8 @@ class Robot : public frc::TimedRobot {
     m_leftFollowMotor->Follow(*m_leftLeadMotor);
     m_rightFollowMotor->Follow(*m_rightLeadMotor);
 
-    adityaFile.open("velocityData.txt");
+    adityaFile.open("velocityData.txt", ios::app); //to append to the next line
+    
     //moving at half speed
     Move(0.5, 0.5);   //Forward
     Move(-0.5, -0.5); //Backward
