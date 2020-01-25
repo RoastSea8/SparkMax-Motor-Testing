@@ -27,11 +27,11 @@ class Robot : public frc::TimedRobot {
    * 
    * Initializes four brushless motors with CAN IDs 1, 2, 3 and 4.
    */
-  static const int leftLeadDeviceID = 1, leftFollowDeviceID = 2, rightLeadDeviceID = 3, rightFollowDeviceID = 4;
+  static const int leftLeadDeviceID = 3, rightLeadDeviceID = 13; //, leftFollowDeviceID = 2, rightFollowDeviceID = 4;
   rev::CANSparkMax* m_leftLeadMotor = new rev::CANSparkMax(leftLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless);
   rev::CANSparkMax* m_rightLeadMotor = new rev::CANSparkMax(rightLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless);
-  rev::CANSparkMax* m_leftFollowMotor = new rev::CANSparkMax(leftFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless);
-  rev::CANSparkMax* m_rightFollowMotor = new rev::CANSparkMax(rightFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless);
+  //rev::CANSparkMax* m_leftFollowMotor = new rev::CANSparkMax(leftFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless);
+  //rev::CANSparkMax* m_rightFollowMotor = new rev::CANSparkMax(rightFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless);
 
   /**
    * A CANAnalog object is constructed using the GetAnalog() method on an 
@@ -137,8 +137,8 @@ class Robot : public frc::TimedRobot {
      */
     m_leftLeadMotor->RestoreFactoryDefaults();
     m_rightLeadMotor->RestoreFactoryDefaults();
-    m_leftFollowMotor->RestoreFactoryDefaults();
-    m_rightFollowMotor->RestoreFactoryDefaults();
+    //m_leftFollowMotor->RestoreFactoryDefaults();
+    //m_rightFollowMotor->RestoreFactoryDefaults();
     
     /**
      * In CAN mode, one SPARK MAX can be configured to follow another. This is done by calling
@@ -147,10 +147,10 @@ class Robot : public frc::TimedRobot {
      * 
      * one motor on each side of our drive train is configured to follow a lead motor.
      */
-    m_leftFollowMotor->Follow(*m_leftLeadMotor);
-    m_rightFollowMotor->Follow(*m_rightLeadMotor);
+    //m_leftFollowMotor->Follow(*m_leftLeadMotor);
+    //m_rightFollowMotor->Follow(*m_rightLeadMotor);
 
-    adityaFile.open("velocityData.txt", ios::app); //to append to the next line
+    adityaFile.open("/home/lvuser/Output.txt", ios::app); //to append to the next line
     
     //moving at half speed
     Move(0.5, 0.5);   //Forward
