@@ -34,12 +34,13 @@ void Robot::TeleopInit() {}
 void Robot::TeleopPeriodic() {
   if (m_controller->GetAButton())
     Move(0.2, 0.2);   // Forward check
-  if (m_controller->GetBButton())
+  else if (m_controller->GetBButton())
     Move(-0.2, -0.2); // Backward check
-  if (m_controller->GetYButton())
+  else if (m_controller->GetYButton())
     Move(-0.2, 0.2);  // Left check
-  if (m_controller->GetXButton())
+  else if (m_controller->GetXButton())
     Move(0.2, -0.2);  // Right check
+  else m_robotDrive->StopMotor();
 }
 
 void Robot::DisabledInit() {}
