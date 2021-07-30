@@ -40,7 +40,8 @@ void Robot::TeleopPeriodic() {
     Move(-0.2, 0.2);  // Left check
   else if (m_controller->GetXButton())
     Move(0.2, -0.2);  // Right check
-  else m_robotDrive->StopMotor();
+  else if (m_controller->GetBumper(frc::GenericHID::kRightHand))
+    m_robotDrive->StopMotor();
 }
 
 void Robot::DisabledInit() {}
