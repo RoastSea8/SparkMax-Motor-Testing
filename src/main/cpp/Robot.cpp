@@ -8,8 +8,6 @@
 #include "Robot.h"
 #include "rev/CANSparkMax.h"
 
-using namespace std; 
-
 void Robot::RobotInit() {
   m_leftLeadMotor->RestoreFactoryDefaults();
   m_rightLeadMotor->RestoreFactoryDefaults();
