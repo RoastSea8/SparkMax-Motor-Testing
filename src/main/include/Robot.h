@@ -16,11 +16,11 @@
 
 class Robot : public frc::TimedRobot {
  public:
-  static const int leftLeadDeviceID = 3, rightLeadDeviceID = 13, leftFollowDeviceID = 2, rightFollowDeviceID = 4;
-  rev::CANSparkMax* m_leftLeadMotor = new rev::CANSparkMax(leftLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless);
-  rev::CANSparkMax* m_rightLeadMotor = new rev::CANSparkMax(rightLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless);
-  rev::CANSparkMax* m_leftFollowMotor = new rev::CANSparkMax(leftFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless);
-  rev::CANSparkMax* m_rightFollowMotor = new rev::CANSparkMax(rightFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless);
+  static const int rightLeadDeviceID = 1, rightFollowDeviceID = 2, leftLeadDeviceID = 3, leftFollowDeviceID = 4;
+  rev::CANSparkMax* m_leftLeadMotor;
+  rev::CANSparkMax* m_rightLeadMotor;
+  rev::CANSparkMax* m_leftFollowMotor;
+  rev::CANSparkMax* m_rightFollowMotor;
 
   double leftMotorSpeed{0.0}, rightMotorSpeed{0.0}, leftMotorVelocity{0.0}, rightMotorVelocity{0.0};
   enum Direction {F, B, L, R};

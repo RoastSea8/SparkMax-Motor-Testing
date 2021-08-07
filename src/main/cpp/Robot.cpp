@@ -9,15 +9,20 @@
 #include "rev/CANSparkMax.h"
 
 void Robot::RobotInit() {
+  m_leftLeadMotor = new rev::CANSparkMax(leftLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless);
+  m_rightLeadMotor = new rev::CANSparkMax(rightLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless);
+  m_leftFollowMotor = new rev::CANSparkMax(leftFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless);
+  m_rightFollowMotor = new rev::CANSparkMax(rightFollowDeviceID, rev::CANSparkMax::MotorType::kBrushless);
+
   m_leftLeadMotor->RestoreFactoryDefaults();
   m_rightLeadMotor->RestoreFactoryDefaults();
   m_leftFollowMotor->RestoreFactoryDefaults();
   m_rightFollowMotor->RestoreFactoryDefaults();
   
-  m_leftLeadMotor->SetInverted(false);
-  m_leftFollowMotor->Follow(*m_leftLeadMotor);
-  m_rightLeadMotor->SetInverted(true);
-  m_rightFollowMotor->Follow(*m_rightLeadMotor);
+  m_leftLeadMotor->SetInverted(true);
+  m_leftFollowMotor->Follow(*m_leftLeadMotor, false);
+  m_rightLeadMotor->SetInverted(false);
+  m_rightFollowMotor->Follow(*m_rightLeadMotor, false);
 
   m_robotDrive = new frc::DifferentialDrive(*m_leftLeadMotor, *m_rightLeadMotor);
 
