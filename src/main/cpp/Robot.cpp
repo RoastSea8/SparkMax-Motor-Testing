@@ -7,6 +7,7 @@
 
 #include "Robot.h"
 #include "rev/CANSparkMax.h"
+#include <frc/smartdashboard/SmartDashboard.h>
 
 void Robot::RobotInit() {
   m_leftLeadMotor = new rev::CANSparkMax(leftLeadDeviceID, rev::CANSparkMax::MotorType::kBrushless);
@@ -28,7 +29,13 @@ void Robot::RobotInit() {
 
   m_controller = new frc::XboxController{0}; // replace with USB port num on DS
 }
-void Robot::RobotPeriodic() {}
+void Robot::RobotPeriodic() {
+  frc::SmartDashboard::PutBoolean("A button pressed", m_controller->GetAButton());
+  frc::SmartDashboard::PutBoolean("B button pressed", m_controller->GetBButton());
+  frc::SmartDashboard::PutBoolean("Y button pressed", m_controller->GetYButton());
+  frc::SmartDashboard::PutBoolean("X button pressed", m_controller->GetXButton());
+  frc::SmartDashboard::PutBoolean("right bumper pressed", m_controller->GetBumper(frc::GenericHID::kRightHand));
+}
 
 void Robot::AutonomousInit() {}
 void Robot::AutonomousPeriodic() {}
